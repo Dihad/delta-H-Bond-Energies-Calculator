@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Graph Paper Shape Analyzer | Dihad Hasan</title>
+    <!-- Add favicon (web icon) below -->
+    <link rel="icon" type="image/png" href="web icon.jpeg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --accent: #ff7b00;
+            --accent-hover: #ff9a40;
+            --grid-color: #e0e0e0;
+            --axis-color: #ff7b00;
+            --nctb-blue: #1a73e8;
+            --nctb-light: #2d2d2d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 10% 20%, rgba(30, 30, 30, 0.9), rgba(18, 18, 18, 1));
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.8fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-bottom: 2px solid var(--accent);
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(255, 123, 0, 0.5);
+            background: linear-gradient(90deg, #ff7b00, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 123, 0, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 123, 0, 0.3);
+        }
+
+        .card-title i {
+            font-size: 1.8rem;
+        }
+
+        .input-section {
+            grid-column: 1;
+        }
+
+        .shape-display {
+            grid-column: 2;
+            grid-row: 2 / 4;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .calculations {
+            grid-column: 1;
+        }
+
+        .actions {
+            grid-column: 1;
+        }
+
+        @media (max-width: 992px) {
+            .shape-display {
+                grid-column: 1;
+                grid-row: auto;
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 123, 0, 0.2);
+        }
+
+        .example {
+            background: rgba(45, 45, 45, 0.6);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--accent);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent), #ff5500);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(255, 123, 0, 0.3);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, var(--accent-hover), #ff7733);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 123, 0, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-block {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .btn i {
+            font-size: 1.2rem;
+        }
+
+        .nctb-btn {
+            background: linear-gradient(135deg, var(--accent), #e06d00);
+        }
+
+        .canvas-container {
+            flex-grow: 1;
+            background-color: #ffffff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #555;
+            min-height: 500px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            background-color: #ffffff;
+            cursor: move;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .result-card {
+            background: rgba(45, 45, 45, 0.6);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 123, 0, 0.2);
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            margin: 10px 0;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .shape-identification {
+            background: rgba(255, 123, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 123, 0, 0.2);
+        }
+
+        .shape-name {
+            font-size: 2rem;
+            color: var(--accent);
+            margin: 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .coordinates-display {
+            background: rgba(45, 45, 45, 0.6);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 123, 0, 0.1);
+        }
+
+        .coordinate-item {
+            padding: 10px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.05rem;
+        }
+
+        .coordinate-item:last-child {
+            border-bottom: none;
+        }
+
+        footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid #333;
+        }
+
+        .arrange-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .arrange-buttons .btn {
+            flex: 1;
+        }
+
+        .zoom-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(30, 30, 30, 0.8);
+            border-top: 1px solid rgba(255, 123, 0, 0.2);
+        }
+
+        .zoom-display {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .shape-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info-card {
+            background: rgba(45, 45, 45, 0.6);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid rgba(255, 123, 0, 0.2);
+        }
+
+        .info-card h3 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* NCTB Calculation Panel - Dark Theme */
+        .calc-panel {
+            grid-column: 1 / -1;
+            margin-top: 30px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 5px solid var(--accent);
+            color: var(--text-primary);
+            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .calc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .calc-title {
+            font-size: 1.8rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .calc-body {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .calc-step {
+            margin-bottom: 25px;
+            padding-left: 20px;
+            border-left: 3px solid rgba(255, 123, 0, 0.3);
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .formula {
+            background: rgba(45, 45, 45, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 123, 0, 0.3);
+            color: var(--text-primary);
+        }
+
+        .calculation {
+            background: rgba(35, 35, 35, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+            border-left: 2px solid var(--accent);
+        }
+
+        .final-result {
+            background: rgba(255, 123, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-align: center;
+            border: 2px solid var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .arrange-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .canvas-container {
+                min-height: 400px;
+            }
+            
+            .shape-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .calc-body {
+                font-size: 1rem;
+            }
+        }
+
+        .point-label {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+            color: #cc0000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+            pointer-events: none;
+            transform: translate(-50%, -100%);
+            white-space: nowrap;
+            text-shadow: 0 0 2px white;
+        }
+
+        .axis-label {
+            position: absolute;
+            font-size: 14px;
+            color: #000;
+            font-weight: bold;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-drafting-compass"></i> Graph Paper Shape Analyzer</h1>
+            <p class="subtitle">Precise geometric analysis with properly aligned graph paper</p>
+        </header>
+
+        <section class="card input-section">
+            <h2 class="card-title"><i class="fas fa-shapes"></i> Shape Input</h2>
+            
+            <div class="input-group">
+                <label for="coordinates">Enter Coordinates (comma separated)</label>
+                <input type="text" id="coordinates" placeholder="Example: (0,0),(3,0),(0,4)">
+            </div>
+            
+            <div class="arrange-buttons">
+                <button id="clockwiseBtn" class="btn"><i class="fas fa-redo"></i> Clockwise</button>
+                <button id="counterBtn" class="btn"><i class="fas fa-undo"></i> Counter-clockwise</button>
+            </div>
+            
+            <div class="example">
+                <p><strong>Examples:</strong></p>
+                <p>Right Triangle: <code>(0,0),(3,0),(0,4)</code></p>
+                <p>Parallelogram: <code>(0,0),(5,0),(7,3),(2,3)</code></p>
+                <p>Rectangle: <code>(0,0),(6,0),(6,4),(0,4)</code></p>
+            </div>
+            
+            <button id="drawBtn" class="btn btn-block"><i class="fas fa-draw-polygon"></i> Analyze & Draw Shape</button>
+            <button id="sampleBtn" class="btn btn-block"><i class="fas fa-book"></i> Load Sample</button>
+            <button id="showCalcBtn" class="btn btn-block nctb-btn"><i class="fas fa-calculator"></i> Show Calculation</button>
+        </section>
+
+        <section class="card shape-display">
+            <h2 class="card-title"><i class="fas fa-paint-brush"></i> Graph Paper Visualization</h2>
+            
+            <div class="canvas-container">
+                <canvas id="shapeCanvas" width="700" height="500"></canvas>
+            </div>
+            
+            <div class="zoom-controls">
+                <button id="zoomOutBtn" class="btn"><i class="fas fa-search-minus"></i></button>
+                <div class="zoom-display">Zoom: <span id="zoomLevel">100%</span></div>
+                <button id="zoomInBtn" class="btn"><i class="fas fa-search-plus"></i></button>
+                <button id="resetViewBtn" class="btn"><i class="fas fa-sync-alt"></i> Reset View</button>
+            </div>
+            
+            <div class="actions" style="display: flex; gap: 10px; padding: 10px 0;">
+                <button id="saveBtn" class="btn" style="flex: 1;"><i class="fas fa-download"></i> Save as Image</button>
+                <button id="clearBtn" class="btn" style="flex: 1;"><i class="fas fa-trash"></i> Clear Canvas</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2 class="card-title"><i class="fas fa-ruler-combined"></i> Measurements & Analysis</h2>
+            
+            <div class="shape-identification">
+                <div class="result-label">Detected Shape</div>
+                <div class="shape-name" id="shapeName">None</div>
+            </div>
+            
+            <div class="shape-info">
+                <div class="info-card">
+                    <h3>Perimeter & Area</h3>
+                    <div class="result-item">
+                        <span class="result-label">Perimeter:</span>
+                        <span class="result-value" id="perimeter">0.00 units</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Area:</span>
+                        <span class="result-value" id="area">0.00 sq units</span>
+                    </div>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Shape Properties</h3>
+                    <div class="result-item">
+                        <span class="result-label">Vertices:</span>
+                        <span class="result-value" id="vertices">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Sides:</span>
+                        <span class="result-value" id="sides">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="coordinates-display">
+                <h3>Side Lengths:</h3>
+                <div id="lineLengths">
+                    <p class="coordinate-item">No line segments calculated</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- NCTB Calculation Panel - Dark Theme -->
+        <div class="calc-panel" id="calcPanel">
+            <div class="calc-header">
+                <div class="calc-title">Detailed Calculation</div>
+                <button id="closeCalcBtn" class="btn nctb-btn"><i class="fas fa-times"></i> Close</button>
+            </div>
+            <div class="calc-body" id="calcBody">
+                <!-- Calculation steps will be inserted here -->
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2025 Dihad Hasan. All rights reserved.</p>
+            
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM elements
+            const canvas = document.getElementById('shapeCanvas');
+            const ctx = canvas.getContext('2d');
+            const drawBtn = document.getElementById('drawBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const coordinatesInput = document.getElementById('coordinates');
+            const perimeterEl = document.getElementById('perimeter');
+            const areaEl = document.getElementById('area');
+            const sidesEl = document.getElementById('sides');
+            const verticesEl = document.getElementById('vertices');
+            const lineLengthsEl = document.getElementById('lineLengths');
+            const shapeNameEl = document.getElementById('shapeName');
+            const clockwiseBtn = document.getElementById('clockwiseBtn');
+            const counterBtn = document.getElementById('counterBtn');
+            const sampleBtn = document.getElementById('sampleBtn');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const resetViewBtn = document.getElementById('resetViewBtn');
+            const zoomLevel = document.getElementById('zoomLevel');
+            const showCalcBtn = document.getElementById('showCalcBtn');
+            const closeCalcBtn = document.getElementById('closeCalcBtn');
+            const calcPanel = document.getElementById('calcPanel');
+            const calcBody = document.getElementById('calcBody');
+
+            // State variables
+            let currentShape = null;
+            let zoom = 1.0;
+            let panX = 0;
+            let panY = 0;
+            let isDragging = false;
+            let lastX = 0;
+            let lastY = 0;
+            const UNIT_SIZE = 40; // Pixels per unit
+            
+            // Sample data
+            const samples = [
+                { 
+                    name: "Right Triangle", 
+                    coords: "(0,0),(3,0),(0,4)",
+                    type: "Right Triangle"
+                },
+                { 
+                    name: "Parallelogram", 
+                    coords: "(0,0),(5,0),(7,3),(2,3)",
+                    type: "Parallelogram"
+                },
+                { 
+                    name: "Rectangle", 
+                    coords: "(0,0),(6,0),(6,4),(0,4)",
+                    type: "Rectangle"
+                }
+            ];
+
+            // Initialize with sample shape
+            coordinatesInput.value = samples[0].coords;
+            drawShape(samples[0].coords);
+
+            // Event listeners
+            drawBtn.addEventListener('click', () => {
+                drawShape(coordinatesInput.value);
+            });
+
+            saveBtn.addEventListener('click', saveAsImage);
+            clearBtn.addEventListener('click', clearCanvas);
+            
+            sampleBtn.addEventListener('click', () => {
+                const randomSample = samples[Math.floor(Math.random() * samples.length)];
+                coordinatesInput.value = randomSample.coords;
+                drawShape(randomSample.coords);
+            });
+            
+            clockwiseBtn.addEventListener('click', () => {
+                if (currentShape) {
+                    arrangeCoordinates('clockwise');
+                }
+            });
+            
+            counterBtn.addEventListener('click', () => {
+                if (currentShape) {
+                    arrangeCoordinates('counterclockwise');
+                }
+            });
+            
+            zoomInBtn.addEventListener('click', () => {
+                zoom *= 1.2;
+                updateZoomDisplay();
+                renderShape();
+            });
+            
+            zoomOutBtn.addEventListener('click', () => {
+                zoom /= 1.2;
+                if (zoom < 0.1) zoom = 0.1;
+                updateZoomDisplay();
+                renderShape();
+            });
+            
+            resetViewBtn.addEventListener('click', () => {
+                zoom = 1.0;
+                panX = 0;
+                panY = 0;
+                updateZoomDisplay();
+                renderShape();
+            });
+            
+            // Panning functionality
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                lastX = e.clientX;
+                lastY = e.clientY;
+                canvas.style.cursor = 'grabbing';
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    panX += (e.clientX - lastX) / zoom;
+                    panY += (e.clientY - lastY) / zoom;
+                    lastX = e.clientX;
+                    lastY = e.clientY;
+                    renderShape();
+                }
+            });
+            
+            canvas.addEventListener('mouseup', () => {
+                isDragging = false;
+                canvas.style.cursor = 'move';
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+                isDragging = false;
+                canvas.style.cursor = 'default';
+            });
+            
+            // Show calculation
+            showCalcBtn.addEventListener('click', () => {
+                if (!currentShape) {
+                    alert('Please draw a shape first');
+                    return;
+                }
+                generateNCTBCalculation();
+                calcPanel.style.display = 'block';
+            });
+            
+            closeCalcBtn.addEventListener('click', () => {
+                calcPanel.style.display = 'none';
+            });
+
+            // --- Fix: Correct shape detection for square/rectangle and parallelogram ---
+            function detectShapeType(shape) {
+                const { points, lineLengths, angles, sides } = shape;
+
+                // Triangle detection
+                if (sides === 3) {
+                    // Check for right angle
+                    if (angles.some(angle => Math.abs(angle - 90) < 1)) {
+                        return "Right Triangle";
+                    }
+                    // Check for equilateral
+                    if (Math.abs(lineLengths[0] - lineLengths[1]) < 0.001 &&
+                        Math.abs(lineLengths[1] - lineLengths[2]) < 0.001) {
+                        return "Equilateral Triangle";
+                    }
+                    // Check for isosceles
+                    if (Math.abs(lineLengths[0] - lineLengths[1]) < 0.001 ||
+                        Math.abs(lineLengths[1] - lineLengths[2]) < 0.001 ||
+                        Math.abs(lineLengths[2] - lineLengths[0]) < 0.001) {
+                        return "Isosceles Triangle";
+                    }
+                    return "Triangle";
+                }
+
+                // Quadrilateral detection
+                if (sides === 4) {
+                    const [a, b, c, d] = lineLengths;
+                    const [angA, angB, angC, angD] = angles;
+
+                    // Check for square
+                    if (
+                        Math.abs(a - b) < 0.001 &&
+                        Math.abs(b - c) < 0.001 &&
+                        Math.abs(c - d) < 0.001 &&
+                        angles.every(angle => Math.abs(angle - 90) < 1)
+                    ) {
+                        return "Square";
+                    }
+                    // Check for rectangle
+                    if (
+                        angles.every(angle => Math.abs(angle - 90) < 1) &&
+                        Math.abs(a - c) < 0.001 &&
+                        Math.abs(b - d) < 0.001
+                    ) {
+                        return "Rectangle";
+                    }
+                    // Check for parallelogram
+                    if (
+                        Math.abs(a - c) < 0.001 &&
+                        Math.abs(b - d) < 0.001 &&
+                        Math.abs(angA - angC) < 1 &&
+                        Math.abs(angB - angD) < 1
+                    ) {
+                        return a === b ? "Rhombus" : "Parallelogram";
+                    }
+                    return "Quadrilateral";
+                }
+
+                // Pentagon and beyond
+                if (sides === 5) return "Pentagon";
+                if (sides === 6) return "Hexagon";
+                if (sides === 7) return "Heptagon";
+                if (sides === 8) return "Octagon";
+
+                return "Polygon";
+            }
+            // --- End fix ---
+
+            // --- Fix: Prevent NaN in angle calculation for collinear or duplicate points ---
+            function calculateAngles(points) {
+                const angles = [];
+                const n = points.length;
+
+                for (let i = 0; i < n; i++) {
+                    const p1 = points[i];
+                    const p2 = points[(i + 1) % n];
+                    const p3 = points[(i + 2) % n];
+
+                    const ux = p1.x - p2.x;
+                    const uy = p1.y - p2.y;
+                    const vx = p3.x - p2.x;
+                    const vy = p3.y - p2.y;
+
+                    const dot = ux * vx + uy * vy;
+                    const lenU = Math.sqrt(ux * ux + uy * uy);
+                    const lenV = Math.sqrt(vx * vx + vy * vy);
+
+                    let angle = 0;
+                    if (lenU > 0 && lenV > 0) {
+                        let cosTheta = dot / (lenU * lenV);
+                        // Clamp due to floating point errors
+                        cosTheta = Math.max(-1, Math.min(1, cosTheta));
+                        angle = Math.acos(cosTheta) * (180 / Math.PI);
+                    }
+                    angles.push(angle);
+                }
+
+                return angles;
+            }
+            // --- End fix ---
+
+            // --- Fix: Prevent drawing if points are collinear or duplicate ---
+            function drawShape(coordinateString) {
+                const points = parseCoordinates(coordinateString);
+
+                if (points.length < 3) {
+                    alert('Please enter at least 3 points to form a shape');
+                    return;
+                }
+                // Check for duplicate points
+                for (let i = 0; i < points.length; i++) {
+                    for (let j = i + 1; j < points.length; j++) {
+                        if (points[i].x === points[j].x && points[i].y === points[j].y) {
+                            alert('Duplicate points detected. Please enter unique points.');
+                            return;
+                        }
+                    }
+                }
+                // Check for collinear points (for triangles)
+                if (points.length === 3) {
+                    const area = Math.abs(
+                        points[0].x * (points[1].y - points[2].y) +
+                        points[1].x * (points[2].y - points[0].y) +
+                        points[2].x * (points[0].y - points[1].y)
+                    ) / 2;
+                    if (area < 1e-8) {
+                        alert('Points are collinear. Please enter non-collinear points.');
+                        return;
+                    }
+                }
+
+                currentShape = {
+                    points,
+                    lineLengths: calculateLineLengths(points),
+                    angles: calculateAngles(points),
+                    perimeter: calculatePerimeter(points),
+                    area: calculateArea(points),
+                    sides: points.length
+                };
+
+                // Detect shape type
+                currentShape.type = detectShapeType(currentShape);
+
+                renderShape();
+                updateUI();
+            }
+            // --- End fix ---
+
+            // --- Fix: Prevent zoom from going below 10% ---
+            zoomInBtn.addEventListener('click', () => {
+                zoom *= 1.2;
+                updateZoomDisplay();
+                renderShape();
+            });
+
+            zoomOutBtn.addEventListener('click', () => {
+                zoom /= 1.2;
+                if (zoom < 0.1) zoom = 0.1;
+                updateZoomDisplay();
+                renderShape();
+            });
+            // --- End fix ---
+
+            // Main drawing function
+            function drawShape(coordinateString) {
+                const points = parseCoordinates(coordinateString);
+                
+                if (points.length < 3) {
+                    alert('Please enter at least 3 points to form a shape');
+                    return;
+                }
+                
+                currentShape = {
+                    points,
+                    lineLengths: calculateLineLengths(points),
+                    angles: calculateAngles(points),
+                    perimeter: calculatePerimeter(points),
+                    area: calculateArea(points),
+                    sides: points.length
+                };
+                
+                // Detect shape type
+                currentShape.type = detectShapeType(currentShape);
+                
+                renderShape();
+                updateUI();
+            }
+
+            // Parse coordinate string into points array
+            function parseCoordinates(str) {
+                const pointRegex = /\((-?\d+\.?\d*),(-?\d+\.?\d*)\)/g;
+                const points = [];
+                let match;
+                
+                while ((match = pointRegex.exec(str)) !== null) {
+                    const x = parseFloat(match[1]);
+                    const y = parseFloat(match[2]);
+                    if (!isNaN(x) && !isNaN(y)) {
+                        points.push({ x, y });
+                    }
+                }
+                
+                return points;
+            }
+
+            // Calculate distances between consecutive points
+            function calculateLineLengths(points) {
+                const lengths = [];
+                for (let i = 0; i < points.length; i++) {
+                    const p1 = points[i];
+                    const p2 = points[(i + 1) % points.length];
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    lengths.push(Math.sqrt(dx * dx + dy * dy));
+                }
+                return lengths;
+            }
+            
+            // Calculate angles at each vertex
+            function calculateAngles(points) {
+                const angles = [];
+                const n = points.length;
+                
+                for (let i = 0; i < n; i++) {
+                    const p1 = points[i];
+                    const p2 = points[(i + 1) % n];
+                    const p3 = points[(i + 2) % n];
+                    
+                    const ux = p1.x - p2.x;
+                    const uy = p1.y - p2.y;
+                    const vx = p3.x - p2.x;
+                    const vy = p3.y - p2.y;
+                    
+                    const dot = ux * vx + uy * vy;
+                    const lenU = Math.sqrt(ux * ux + uy * uy);
+                    const lenV = Math.sqrt(vx * vx + vy * vy);
+                    
+                    let angle = 0;
+                    if (lenU > 0 && lenV > 0) {
+                        let cosTheta = dot / (lenU * lenV);
+                        // Clamp due to floating point errors
+                        cosTheta = Math.max(-1, Math.min(1, cosTheta));
+                        angle = Math.acos(cosTheta) * (180 / Math.PI);
+                    }
+                    angles.push(angle);
+                }
+                
+                return angles;
+            }
+
+            // Calculate perimeter of shape
+            function calculatePerimeter(points) {
+                return calculateLineLengths(points).reduce((sum, length) => sum + length, 0);
+            }
+
+            // Calculate area using Shoelace formula
+            function calculateArea(points) {
+                let area = 0;
+                const n = points.length;
+                
+                for (let i = 0; i < n; i++) {
+                    const j = (i + 1) % n;
+                    area += points[i].x * points[j].y;
+                    area -= points[j].x * points[i].y;
+                }
+                
+                return Math.abs(area) / 2;
+            }
+
+            // Detect shape type based on properties
+            function detectShapeType(shape) {
+                const { points, lineLengths, angles, sides } = shape;
+                
+                // Triangle detection
+                if (sides === 3) {
+                    // Check for right angle
+                    if (angles.some(angle => Math.abs(angle - 90) < 1)) {
+                        return "Right Triangle";
+                    }
+                    
+                    // Check for equilateral
+                    if (Math.abs(lineLengths[0] - lineLengths[1]) < 0.001 && 
+                        Math.abs(lineLengths[1] - lineLengths[2]) < 0.001) {
+                        return "Equilateral Triangle";
+                    }
+                    
+                    // Check for isosceles
+                    if (Math.abs(lineLengths[0] - lineLengths[1]) < 0.001 || 
+                        Math.abs(lineLengths[1] - lineLengths[2]) < 0.001 || 
+                        Math.abs(lineLengths[2] - lineLengths[0]) < 0.001) {
+                        return "Isosceles Triangle";
+                    }
+                    
+                    return "Triangle";
+                }
+                
+                // Quadrilateral detection
+                if (sides === 4) {
+                    const [a, b, c, d] = lineLengths;
+                    const [angA, angB, angC, angD] = angles;
+                    
+                    // Check for square
+                    if (
+                        Math.abs(a - b) < 0.001 &&
+                        Math.abs(b - c) < 0.001 &&
+                        Math.abs(c - d) < 0.001 &&
+                        angles.every(angle => Math.abs(angle - 90) < 1)
+                    ) {
+                        return "Square";
+                    }
+                    // Check for rectangle
+                    if (
+                        angles.every(angle => Math.abs(angle - 90) < 1) &&
+                        Math.abs(a - c) < 0.001 &&
+                        Math.abs(b - d) < 0.001
+                    ) {
+                        return "Rectangle";
+                    }
+                    // Check for parallelogram
+                    if (
+                        Math.abs(a - c) < 0.001 &&
+                        Math.abs(b - d) < 0.001 &&
+                        Math.abs(angA - angC) < 1 &&
+                        Math.abs(angB - angD) < 1
+                    ) {
+                        return a === b ? "Rhombus" : "Parallelogram";
+                    }
+                    return "Quadrilateral";
+                }
+                
+                // Pentagon and beyond
+                if (sides === 5) return "Pentagon";
+                if (sides === 6) return "Hexagon";
+                if (sides === 7) return "Heptagon";
+                if (sides === 8) return "Octagon";
+                
+                return "Polygon";
+            }
+
+            // Render the shape on canvas with graph paper
+            function renderShape() {
+                if (!currentShape) return;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Fill with graph paper background
+                drawGraphPaper();
+                
+                // Calculate center offset
+                const centerX = canvas.width / 2 + panX * zoom;
+                const centerY = canvas.height / 2 + panY * zoom;
+                
+                // Draw axes
+                drawAxes(centerX, centerY);
+                
+                // Draw shape
+                ctx.beginPath();
+                
+                // Move to first point
+                const firstPoint = currentShape.points[0];
+                const firstCanvasX = centerX + firstPoint.x * UNIT_SIZE * zoom;
+                const firstCanvasY = centerY - firstPoint.y * UNIT_SIZE * zoom;
+                ctx.moveTo(firstCanvasX, firstCanvasY);
+                
+                // Draw lines to other points
+                for (let i = 1; i < currentShape.points.length; i++) {
+                    const point = currentShape.points[i];
+                    const canvasX = centerX + point.x * UNIT_SIZE * zoom;
+                    const canvasY = centerY - point.y * UNIT_SIZE * zoom;
+                    ctx.lineTo(canvasX, canvasY);
+                }
+                
+                // Close the shape
+                ctx.closePath();
+                
+                // Draw styling
+                ctx.fillStyle = 'rgba(0, 100, 255, 0.3)';
+                ctx.strokeStyle = '#0066ff';
+                ctx.lineWidth = 3 * zoom;
+                ctx.fill();
+                ctx.stroke();
+                
+                // Draw vertices with labels
+                for (let i = 0; i < currentShape.points.length; i++) {
+                    const point = currentShape.points[i];
+                    const canvasX = centerX + point.x * UNIT_SIZE * zoom;
+                    const canvasY = centerY - point.y * UNIT_SIZE * zoom;
+                    
+                    ctx.beginPath();
+                    ctx.arc(canvasX, canvasY, 6 * zoom, 0, Math.PI * 2);
+                    ctx.fillStyle = '#cc0000';
+                    ctx.fill();
+                    
+                    // Draw point labels
+                    ctx.fillStyle = '#cc0000';
+                    ctx.font = `${14 * zoom}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(`${String.fromCharCode(65+i)}(${point.x},${point.y})`, canvasX, canvasY - 25 * zoom);
+                }
+                
+                // Draw side lengths
+                ctx.fillStyle = '#006600';
+                ctx.font = `${12 * zoom}px Arial`;
+                
+                for (let i = 0; i < currentShape.points.length; i++) {
+                    const p1 = currentShape.points[i];
+                    const p2 = currentShape.points[(i + 1) % currentShape.points.length];
+                    
+                    const midX = (p1.x + p2.x) / 2;
+                    const midY = (p1.y + p2.y) / 2;
+                    
+                    const canvasX = centerX + midX * UNIT_SIZE * zoom;
+                    const canvasY = centerY - midY * UNIT_SIZE * zoom;
+                    
+                    ctx.fillText(currentShape.lineLengths[i].toFixed(2), canvasX, canvasY);
+                }
+            }
+
+            // Draw graph paper background with aligned axes
+            function drawGraphPaper() {
+                // Fill with white background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw grid lines
+                ctx.strokeStyle = '#e0e0e0';
+                ctx.lineWidth = 1;
+                
+                // Calculate visible area
+                const centerX = canvas.width / 2 + panX * zoom;
+                const centerY = canvas.height / 2 + panY * zoom;
+                
+                // Vertical lines
+                const startX = Math.floor((0 - centerX) / (UNIT_SIZE * zoom)) * UNIT_SIZE;
+                const endX = Math.ceil((canvas.width - centerX) / (UNIT_SIZE * zoom)) * UNIT_SIZE;
+                
+                for (let x = startX; x <= endX; x += UNIT_SIZE) {
+                    const canvasX = centerX + x * zoom;
+                    ctx.beginPath();
+                    ctx.moveTo(canvasX, 0);
+                    ctx.lineTo(canvasX, canvas.height);
+                    ctx.stroke();
+                }
+                
+                // Horizontal lines
+                const startY = Math.floor((0 - centerY) / (UNIT_SIZE * zoom)) * UNIT_SIZE;
+                const endY = Math.ceil((canvas.height - centerY) / (UNIT_SIZE * zoom)) * UNIT_SIZE;
+                
+                for (let y = startY; y <= endY; y += UNIT_SIZE) {
+                    const canvasY = centerY + y * zoom;
+                    ctx.beginPath();
+                    ctx.moveTo(0, canvasY);
+                    ctx.lineTo(canvas.width, canvasY);
+                    ctx.stroke();
+                }
+                
+                // Draw thicker lines at 5-unit intervals
+                ctx.strokeStyle = '#c0c0c0';
+                ctx.lineWidth = 1.5;
+                
+                // Vertical lines at 5-unit intervals
+                for (let x = startX; x <= endX; x += 5 * UNIT_SIZE) {
+                    if (x === 0) continue; // Skip origin
+                    const canvasX = centerX + x * zoom;
+                    ctx.beginPath();
+                    ctx.moveTo(canvasX, 0);
+                    ctx.lineTo(canvasX, canvas.height);
+                    ctx.stroke();
+                }
+                
+                // Horizontal lines at 5-unit intervals
+                for (let y = startY; y <= endY; y += 5 * UNIT_SIZE) {
+                    if (y === 0) continue; // Skip origin
+                    const canvasY = centerY + y * zoom;
+                    ctx.beginPath();
+                    ctx.moveTo(0, canvasY);
+                    ctx.lineTo(canvas.width, canvasY);
+                    ctx.stroke();
+                }
+            }
+
+            // Draw axes with proper alignment
+            function drawAxes(centerX, centerY) {
+                // Draw axes
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 2 * zoom;
+                
+                // X-axis
+                ctx.beginPath();
+                ctx.moveTo(0, centerY);
+                ctx.lineTo(canvas.width, centerY);
+                ctx.stroke();
+                
+                // Y-axis
+                ctx.beginPath();
+                ctx.moveTo(centerX, 0);
+                ctx.lineTo(centerX, canvas.height);
+                ctx.stroke();
+                
+                // Draw axis labels
+                ctx.fillStyle = '#000000';
+                ctx.font = `${14 * zoom}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // X-axis labels
+                for (let x = -10; x <= 10; x++) {
+                    if (x === 0) continue; // Skip origin
+                    const canvasX = centerX + x * UNIT_SIZE * zoom;
+                    if (canvasX > 30 && canvasX < canvas.width - 30) {
+                        ctx.fillText(x.toString(), canvasX, centerY + 20 * zoom);
+                    }
+                }
+                
+                // Y-axis labels
+                for (let y = -10; y <= 10; y++) {
+                    if (y === 0) continue; // Skip origin
+                    const canvasY = centerY - y * UNIT_SIZE * zoom;
+                    if (canvasY > 30 && canvasY < canvas.height - 30) {
+                        ctx.fillText(y.toString(), centerX - 20 * zoom, canvasY);
+                    }
+                }
+                
+                // Draw origin label
+                ctx.fillText("0", centerX - 15 * zoom, centerY + 15 * zoom);
+                
+                // Draw axis titles
+                ctx.font = `${16 * zoom}px Arial`;
+                ctx.fillText('X', canvas.width - 30 * zoom, centerY - 15 * zoom);
+                ctx.fillText('Y', centerX + 25 * zoom, 20 * zoom);
+                
+                // Draw axis arrows
+                ctx.beginPath();
+                // X-axis arrow
+                ctx.moveTo(canvas.width - 20, centerY - 8);
+                ctx.lineTo(canvas.width, centerY);
+                ctx.lineTo(canvas.width - 20, centerY + 8);
+                ctx.fillStyle = '#000000';
+                ctx.fill();
+                
+                // Y-axis arrow
+                ctx.beginPath();
+                ctx.moveTo(centerX - 8, 20);
+                ctx.lineTo(centerX, 0);
+                ctx.lineTo(centerX + 8, 20);
+                ctx.fill();
+            }
+
+            // Update UI with calculations
+            function updateUI() {
+                if (!currentShape) return;
+                
+                perimeterEl.textContent = currentShape.perimeter.toFixed(2) + " units";
+                areaEl.textContent = currentShape.area.toFixed(2) + " sq units";
+                sidesEl.textContent = currentShape.sides;
+                verticesEl.textContent = currentShape.points.length;
+                shapeNameEl.textContent = currentShape.type;
+                
+                // Update line lengths display
+                lineLengthsEl.innerHTML = '';
+                currentShape.lineLengths.forEach((length, i) => {
+                    const startChar = String.fromCharCode(65 + i);
+                    const endChar = String.fromCharCode(65 + (i + 1) % currentShape.points.length);
+                    const item = document.createElement('div');
+                    item.className = 'coordinate-item';
+                    item.innerHTML = `<span>${startChar}${endChar}:</span> <span>${length.toFixed(2)} units</span>`;
+                    lineLengthsEl.appendChild(item);
+                });
+            }
+
+            // Arrange coordinates in clockwise or counterclockwise order
+            function arrangeCoordinates(direction) {
+                const points = [...currentShape.points];
+                
+                // Calculate centroid
+                const centroid = {x: 0, y: 0};
+                for (const point of points) {
+                    centroid.x += point.x;
+                    centroid.y += point.y;
+                }
+                centroid.x /= points.length;
+                centroid.y /= points.length;
+                
+                // Sort points by angle
+                points.sort((a, b) => {
+                    const angleA = Math.atan2(a.y - centroid.y, a.x - centroid.x);
+                    const angleB = Math.atan2(b.y - centroid.y, b.x - centroid.x);
+                    return direction === 'clockwise' ? angleB - angleA : angleA - angleB;
+                });
+                
+                // Update current shape and redraw
+                currentShape.points = points;
+                currentShape.lineLengths = calculateLineLengths(points);
+                currentShape.angles = calculateAngles(points);
+                currentShape.type = detectShapeType(currentShape);
+                
+                // Update input field
+                coordinatesInput.value = points.map(p => `(${p.x},${p.y})`).join(',');
+                
+                renderShape();
+                updateUI();
+            }
+
+            // Update zoom display
+            function updateZoomDisplay() {
+                zoomLevel.textContent = Math.round(zoom * 100) + '%';
+            }
+
+            // Generate NCTB-style calculation with dark theme
+            function generateNCTBCalculation() {
+                if (!currentShape) return;
+                
+                const { points, lineLengths, perimeter, area, type } = currentShape;
+                let calcHTML = '';
+                
+                // Step 1: Identify coordinates
+                calcHTML += `
+                    <div class="calc-step">
+                        <div class="step-title">Step 1: Identify Coordinates</div>
+                        <div class="calculation">
+                            ${points.map((p, i) => 
+                                `${String.fromCharCode(65+i)}(${p.x}, ${p.y})`
+                            ).join(', ')}
+                        </div>
+                    </div>
+                `;
+                
+                // Step 2: Calculate side lengths
+                calcHTML += `
+                    <div class="calc-step">
+                        <div class="step-title">Step 2: Calculate Side Lengths</div>
+                        <div class="formula">
+                            Distance Formula: √[(x₂ - x₁)² + (y₂ - y₁)²]
+                        </div>
+                `;
+                
+                for (let i = 0; i < points.length; i++) {
+                    const p1 = points[i];
+                    const p2 = points[(i + 1) % points.length];
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const distance = lineLengths[i].toFixed(2);
+                    
+                    calcHTML += `
+                        <div class="calculation">
+                            ${String.fromCharCode(65+i)}${String.fromCharCode(65+(i+1)%points.length)} = 
+                            √[(${p2.x} - ${p1.x})² + (${p2.y} - ${p1.y})²] = 
+                            √[${dx}² + ${dy}²] = 
+                            √[${dx*dx} + ${dy*dy}] = 
+                            √${dx*dx + dy*dy} = 
+                            ${distance} units
+                        </div>
+                    `;
+                }
+                
+                calcHTML += `</div>`;
+                
+                // Step 3: Calculate perimeter
+                calcHTML += `
+                    <div class="calc-step">
+                        <div class="step-title">Step 3: Calculate Perimeter</div>
+                        <div class="calculation">
+                            Perimeter = Sum of all sides = 
+                            ${lineLengths.map(l => l.toFixed(2)).join(' + ')} = 
+                            ${perimeter.toFixed(2)} units
+                        </div>
+                    </div>
+                `;
+                
+                // Step 4: Calculate area (Shoelace formula)
+                calcHTML += `
+                    <div class="calc-step">
+                        <div class="step-title">Step 4: Calculate Area (Shoelace Formula)</div>
+                        <div class="formula">
+                            Area = ½ |∑(xᵢyᵢ₊₁ - xᵢ₊₁yᵢ)|
+                        </div>
+                        <div class="calculation">
+                            Points in order: ${points.map((p, i) => 
+                                `${String.fromCharCode(65+i)}(${p.x}, ${p.y})`
+                            ).join(', ')}
+                        </div>
+                `;
+                
+                let sum1 = 0;
+                let sum2 = 0;
+                let shoelaceSteps = '';
+                
+                for (let i = 0; i < points.length; i++) {
+                    const j = (i + 1) % points.length;
+                    sum1 += points[i].x * points[j].y;
+                    sum2 += points[j].x * points[i].y;
+                    
+                    shoelaceSteps += `(${points[i].x} × ${points[j].y}) ${i < points.length-1 ? '+' : ''} `;
+                }
+                
+                const shoelaceResult = Math.abs(sum1 - sum2)/2;
+                
+                calcHTML += `
+                    <div class="calculation">
+                        Sum1 (xᵢyᵢ₊₁) = ${shoelaceSteps} = ${sum1}
+                    </div>
+                    <div class="calculation">
+                        Sum2 (xᵢ₊₁yᵢ) = ${points.map((p, i) => {
+                            const j = (i + 1) % points.length;
+                            return `(${points[j].x} × ${points[i].y})`;
+                        }).join(' + ')} = ${sum2}
+                    </div>
+                    <div class="calculation">
+                        Area = ½ |${sum1} - ${sum2}| = ½ |${sum1 - sum2}| = ½ × ${Math.abs(sum1 - sum2)} = ${shoelaceResult.toFixed(2)} sq units
+                    </div>
+                `;
+                
+                calcHTML += `</div>`;
+                
+                // Final result
+                calcHTML += `
+                    <div class="final-result">
+                        The ${type} has a perimeter of ${perimeter.toFixed(2)} units and an area of ${area.toFixed(2)} sq units
+                    </div>
+                `;
+                
+                calcBody.innerHTML = calcHTML;
+            }
+
+            // Save canvas as image
+            function saveAsImage() {
+                if (!currentShape) {
+                    alert('Draw a shape first before saving');
+                    return;
+                }
+                
+                const link = document.createElement('a');
+                link.download = 'graph-paper-shape-' + new Date().toISOString().slice(0, 10) + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+
+            // Clear canvas and reset UI
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGraphPaper();
+                currentShape = null;
+                zoom = 1.0;
+                panX = 0;
+                panY = 0;
+                updateZoomDisplay();
+                calcPanel.style.display = 'none';
+                
+                perimeterEl.textContent = "0.00 units";
+                areaEl.textContent = "0.00 sq units";
+                sidesEl.textContent = '0';
+                verticesEl.textContent = '0';
+                shapeNameEl.textContent = 'None';
+                
+                lineLengthsEl.innerHTML = '<p class="coordinate-item">No line segments calculated</p>';
+            }
+        });
+    </script>
+</body>
+</html>
